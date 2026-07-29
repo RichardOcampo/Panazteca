@@ -1,0 +1,244 @@
+:root {
+    --crema: #FBF3E7;
+    --masa: #E8A45C;
+    --masa-oscuro: #8B4A1E;
+    --texto: #2B1B10;
+    --texto-suave: #6B5744;
+    --borde: #EDE0CC;
+    --acento: #25D366;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: var(--crema);
+    color: var(--texto);
+}
+
+.app {
+    width: 100%;
+    min-height: 100vh;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ---- TOP BAR ---- */
+.top-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 24px;
+    border-bottom: 1px solid var(--borde);
+}
+
+.logo {
+    font-weight: 800;
+    letter-spacing: .5px;
+    font-size: 16px;
+}
+
+.top-bar-icons {
+    display: flex;
+    gap: 18px;
+    align-items: center;
+}
+
+.icon-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--texto);
+    font-size: 18px;
+}
+
+.icon-btn.whatsapp {
+    color: var(--acento);
+}
+
+/* ---- HERO ---- */
+.product-hero {
+    background: linear-gradient(180deg, #F6DCC4, #F1CBA5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+}
+
+.product-hero img {
+    max-width: 220px;
+    width: 100%;
+    height: auto;
+}
+
+/* ---- CONTENIDO PRINCIPAL (info + cross-nav) ---- */
+.main-content {
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 28px 24px 40px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 32px;
+}
+
+/* ---- INFO ---- */
+.product-name {
+    font-size: 24px;
+    font-weight: 800;
+    line-height: 1.25;
+}
+
+.product-category {
+    display: inline-block;
+    margin-top: 10px;
+    background: var(--masa);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .4px;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 20px;
+}
+
+.product-description {
+    margin-top: 14px;
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--texto-suave);
+    max-width: 640px;
+}
+
+/* ---- INGREDIENTES / PRECIO ---- */
+.product-details {
+    list-style: none;
+    margin-top: 16px;
+    font-size: 15px;
+}
+
+.product-details li {
+    position: relative;
+    padding-left: 18px;
+    margin-bottom: 8px;
+    color: var(--texto);
+}
+
+.product-details li::before {
+    content: "•";
+    position: absolute;
+    left: 0;
+    color: var(--masa-oscuro);
+}
+
+.product-details li.precio {
+    font-weight: 800;
+    font-size: 18px;
+}
+
+/* ---- CROSS-NAVIGATION ---- */
+.cross-nav h3 {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: .4px;
+    color: var(--texto-suave);
+    margin-bottom: 14px;
+}
+
+.cross-nav-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+}
+
+.cross-nav-card {
+    border: 1px solid var(--borde);
+    border-radius: 12px;
+    padding: 16px 12px;
+    text-align: center;
+    background: #FFFDF9;
+    cursor: pointer;
+    font-size: 12.5px;
+    font-weight: 700;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    transition: box-shadow .15s ease, transform .15s ease;
+}
+
+.cross-nav-card:hover {
+    box-shadow: 0 6px 16px rgba(139, 74, 30, .12);
+    transform: translateY(-2px);
+}
+
+.cross-nav-card img {
+    width: 44px;
+    height: auto;
+}
+
+/* ---- BOTTOM NAV ---- */
+.bottom-nav {
+    margin-top: auto;
+    display: flex;
+    justify-content: center;
+    border-top: 1px solid var(--borde);
+    padding: 14px 0;
+    gap: 48px;
+}
+
+.bottom-nav a {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    text-decoration: none;
+    color: var(--texto-suave);
+}
+
+.bottom-nav a.active {
+    color: var(--masa-oscuro);
+}
+
+/* ---- RESPONSIVE: escritorio / tablet ---- */
+@media (min-width:720px) {
+    .main-content {
+        grid-template-columns: 1.3fr 1fr;
+        align-items: start;
+    }
+
+    .cross-nav {
+        grid-column: 2;
+        grid-row: 1 / span 2;
+    }
+
+    .product-hero img {
+        max-width: 300px;
+    }
+
+    .bottom-nav {
+        justify-content: flex-start;
+        padding: 14px 24px;
+    }
+}
+
+@media (min-width:1024px) {
+    .product-hero {
+        padding: 56px 20px;
+    }
+
+    .product-hero img {
+        max-width: 340px;
+    }
+
+    .product-name {
+        font-size: 28px;
+    }
+}
