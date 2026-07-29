@@ -1,10 +1,14 @@
 :root {
-    --crema: #FBF3E7;
+    --crema: #000000;
+    --superficie: #1E1D19;
     --masa: #E8A45C;
     --masa-oscuro: #8B4A1E;
-    --texto: #2B1B10;
-    --texto-suave: #6B5744;
-    --borde: #EDE0CC;
+    --hero-inicio: #412F1B;
+    --hero-fin: #513619;
+    --badge-bg: #694928;
+    --texto: #FFFFFF;
+    --texto-suave: #D2C5BB;
+    --borde: #2A2620;
     --acento: #25D366;
 }
 
@@ -23,7 +27,7 @@ body {
 .app {
     width: 100%;
     min-height: 100vh;
-    background: #fff;
+    background: var(--crema);
     display: flex;
     flex-direction: column;
 }
@@ -38,42 +42,37 @@ body {
 }
 
 .logo {
-    font-weight: 800;
-    letter-spacing: .5px;
-    font-size: 16px;
-}
-
-.top-bar-icons {
     display: flex;
-    gap: 18px;
     align-items: center;
 }
 
-.icon-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: var(--texto);
-    font-size: 18px;
+.logo img {
+    height: 44px;       /* Define el alto de tu barra/logo */
+    width: auto;        /* Mantiene la proporción original */
+    object-fit: contain;
+    display: block;
 }
 
-.icon-btn.whatsapp {
-    color: var(--acento);
+.brand-name {
+    font-size: 19px;
+    font-weight: 800;
+    letter-spacing: .3px;
+    color: var(--texto);
 }
 
 /* ---- HERO ---- */
 .product-hero {
-    background: linear-gradient(180deg, #F6DCC4, #F1CBA5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 40px 20px;
+    background: linear-gradient(180deg, var(--hero-inicio), var(--hero-fin));
+    position: relative;
+    height: 260px;
+    overflow: hidden;
 }
 
 .product-hero img {
-    max-width: 220px;
+    display: block;
     width: 100%;
-    height: auto;
+    height: 100%;
+    object-fit: cover;
 }
 
 /* ---- CONTENIDO PRINCIPAL (info + cross-nav) ---- */
@@ -97,7 +96,7 @@ body {
 .product-category {
     display: inline-block;
     margin-top: 10px;
-    background: var(--masa);
+    background: var(--badge-bg);
     color: #fff;
     font-size: 11px;
     font-weight: 700;
@@ -133,7 +132,7 @@ body {
     content: "•";
     position: absolute;
     left: 0;
-    color: var(--masa-oscuro);
+    color: var(--masa);
 }
 
 .product-details li.precio {
@@ -161,7 +160,7 @@ body {
     border-radius: 12px;
     padding: 16px 12px;
     text-align: center;
-    background: #FFFDF9;
+    background: var(--superficie);
     cursor: pointer;
     font-size: 12.5px;
     font-weight: 700;
@@ -173,7 +172,7 @@ body {
 }
 
 .cross-nav-card:hover {
-    box-shadow: 0 6px 16px rgba(139, 74, 30, .12);
+    box-shadow: 0 6px 16px rgba(232, 164, 92, .18);
     transform: translateY(-2px);
 }
 
@@ -204,7 +203,7 @@ body {
 }
 
 .bottom-nav a.active {
-    color: var(--masa-oscuro);
+    color: var(--masa);
 }
 
 /* ---- RESPONSIVE: escritorio / tablet ---- */
@@ -219,8 +218,8 @@ body {
         grid-row: 1 / span 2;
     }
 
-    .product-hero img {
-        max-width: 300px;
+    .product-hero {
+        height: 340px;
     }
 
     .bottom-nav {
@@ -231,11 +230,7 @@ body {
 
 @media (min-width:1024px) {
     .product-hero {
-        padding: 56px 20px;
-    }
-
-    .product-hero img {
-        max-width: 340px;
+        height: 420px;
     }
 
     .product-name {
