@@ -1,101 +1,140 @@
-const PRODUCTO_POR_DEFECTO = "Surtido";
-  const PARAM_URL = "producto"; // así se verá: pagina.html?producto=Surtido
+const PRODUCTO_POR_DEFECTO = "1";   // debe existir en catalogo.js
+const PARAM_URL = "producto";       // pagina.html?producto=1
 
-  // Mapea cada botón de cross-nav a un producto "representante" de esa categoría
-  const categoriaAProducto = {
-    "Barra": "Barra",
-    "Galleta": "Galleta"
+// Valores que luego mandarás al servidor para contar escaneos
+let productoActualId = null;
+let categoriaActualId = null;
+let subcategoriaActualId = null;
+
+// ---------------------------------------------
+// Tarjeta de cross-nav (se genera igual para todas)
+// ---------------------------------------------
+function crearTarjeta(id) {
+  const p = productos[id];
+  return `
+    <button class="cross-nav-card" data-id="${id}">
+      <img src="${p.imagen}" alt="${p.nombre}">
+      <span>${p.nombre}</span>
+    </button>`;
+}
+
+// ---------------------------------------------
+// Cross-nav automático:
+//  - "Otras variantes": mismos productos de la misma subcategoría
+//  - "Otras opciones": un representante de cada OTRA subcategoría
+// ---------------------------------------------
+function renderCrossNav() {
+  const actual = productos[productoActualId];
+  const ids = Object.keys(productos);
+
+  const variantes = ids.filter(id =>
+    id !== productoActualId &&
+    productos[id].subcategoria === actual.subcategoria
+  );
+
+  const vistas = new Set([actual.subcategoria]);
+  const otras = [];
+  ids.forEach(id => {
+    const sub = productos[id].subcategoria;
+    if (!vistas.has(sub)) {
+      vistas.add(sub);
+      otras.push(id); // el primer producto de esa subcategoría
+    }
+  });
+
+  const pintar = (contenedorId, tituloId, lista) => {
+    document.getElementById(contenedorId).innerHTML = lista.map(crearTarjeta).join("");
+    // Si no hay nada que mostrar, se oculta también el título
+    document.getElementById(tituloId).style.display = lista.length ? "" : "none";
   };
 
-  // Guarda el id del producto y de su categoría actualmente visibles.
-  // A futuro, este es el valor que se mandaría al servidor para
-  // contar cuántas veces se escaneó el QR de cada pan.
-  let productoActualId = null;
-  let categoriaActualId = null;
+  pintar("variantes-container", "variantes-titulo", variantes);
+  pintar("otras-container", "otras-titulo", otras);
+}
 
-  // ---------------------------------------------
-  // 2. LA FUNCIÓN QUE PINTA UN PRODUCTO EN EL DOM
-  // ---------------------------------------------
-  function renderProduct(id) {
-    const producto = productos[id];
-    if (!producto) {
-      console.warn('Producto no encontrado:', id);
-      return;
-    }
+// ---------------------------------------------
+// Pinta un producto
+// ---------------------------------------------
+function renderProduct(id) {
+  id = String(id);
+  let producto = productos[id];
 
-    productoActualId = id;
-    categoriaActualId = producto.categoria; // ej. "Pan Dulce"
-
-    document.getElementById('product-image').src = producto.imagen;
-    document.getElementById('product-image').alt = producto.nombre;
-    document.getElementById('product-name').textContent = producto.nombre;
-    document.getElementById('product-category').textContent = `Categoría: ${producto.categoria}`;
-    document.getElementById('product-description').textContent = producto.descripcion;
-
-    // El precio es opcional: si el producto no lo trae, se oculta esa línea.
-    const precioLi = document.getElementById('precio');
-    if (producto.precio) {
-      precioLi.textContent = producto.precio;
-      precioLi.style.display = '';
-    } else {
-      precioLi.style.display = 'none';
-    }
-
-    // Reconstruye la lista de ingredientes (puede variar en cantidad)
-    const lista = document.getElementById('ingredientes-lista');
-    lista.querySelectorAll('li:not(.precio)').forEach(li => li.remove());
-    producto.ingredientes.forEach(ing => {
-      const li = document.createElement('li');
-      li.textContent = ing;
-      lista.insertBefore(li, precioLi); // el precio siempre queda al final
-    });
-
-    // NOTA (a futuro, no ahora): aquí es donde se mandaría al servidor
-    // el conteo de escaneo, algo como:
-    // fetch(`/api/escaneos?producto=${productoActualId}`, { method: 'POST' });
+  // Si el QR trae un ID que no existe, se muestra el producto por defecto
+  if (!producto) {
+    console.warn("Producto no encontrado:", id);
+    id = PRODUCTO_POR_DEFECTO;
+    producto = productos[id];
   }
 
-  // ---------------------------------------------
-  // 3. LEER EL ID DE PRODUCTO DESDE LA URL
-  //    Ejemplo real de QR: https://tusitio.com/producto.html?producto=concha
-  // ---------------------------------------------
-  function obtenerIdDesdeURL() {
-    const params = new URLSearchParams(window.location.search);
-    return params.get(PARAM_URL);
+  productoActualId = id;
+  categoriaActualId = producto.categoria;
+  subcategoriaActualId = producto.subcategoria;
+
+  document.getElementById("product-image").src = producto.imagen;
+  document.getElementById("product-image").alt = producto.nombre;
+  document.getElementById("product-name").textContent = producto.nombre;
+  document.getElementById("product-category").textContent =
+    `Categoría: ${producto.categoria} · ${producto.subcategoria}`;
+  document.getElementById("product-description").textContent = producto.descripcion;
+
+  const precioLi = document.getElementById("precio");
+  if (producto.precio) {
+    precioLi.textContent = producto.precio;
+    precioLi.style.display = "";
+  } else {
+    precioLi.style.display = "none";
   }
 
-  // Actualiza la URL sin recargar la página, para que sea
-  // compartible/copiable y refleje el producto que se está viendo.
-  function actualizarURL(id) {
-    const url = new URL(window.location);
-    url.searchParams.set(PARAM_URL, id);
-    history.pushState({ producto: id }, '', url);
-  }
-
-  // ---------------------------------------------
-  // 4. CONECTAR LOS BOTONES DE CROSS-NAVIGATION
-  // ---------------------------------------------
-  document.querySelectorAll('.cross-nav-card').forEach(card => {
-    card.addEventListener('click', () => {
-      const categoria = card.dataset.category;
-      const idProducto = categoriaAProducto[categoria];
-      if (idProducto) {
-        renderProduct(idProducto);
-        actualizarURL(idProducto);
-      }
-    });
+  const lista = document.getElementById("ingredientes-lista");
+  lista.querySelectorAll("li:not(.precio)").forEach(li => li.remove());
+  producto.ingredientes.forEach(ing => {
+    const li = document.createElement("li");
+    li.textContent = ing;
+    lista.insertBefore(li, precioLi);
   });
 
-  // Soporta el botón de "atrás/adelante" del navegador
-  window.addEventListener('popstate', () => {
-    const id = obtenerIdDesdeURL() || PRODUCTO_POR_DEFECTO;
-    renderProduct(id);
-  });
+  renderCrossNav();
 
-  // ---------------------------------------------
-  // 5. PRODUCTO INICIAL: viene del QR / de la URL,
-  //    o si no hay ninguno, se usa uno por defecto.
-  // ---------------------------------------------
-  const idInicial = obtenerIdDesdeURL() || PRODUCTO_POR_DEFECTO;
-  renderProduct(idInicial);
-  actualizarURL(idInicial);
+  // A futuro: aquí se manda el conteo de escaneo
+  // fetch(`/api/escaneos`, { method: "POST", body: JSON.stringify({
+  //   producto: productoActualId, categoria: categoriaActualId, subcategoria: subcategoriaActualId }) });
+
+  return id;
+}
+
+// ---------------------------------------------
+// URL
+// ---------------------------------------------
+function obtenerIdDesdeURL() {
+  return new URLSearchParams(window.location.search).get(PARAM_URL);
+}
+
+function actualizarURL(id, reemplazar = false) {
+  const url = new URL(window.location);
+  url.searchParams.set(PARAM_URL, id);
+  const metodo = reemplazar ? "replaceState" : "pushState";
+  history[metodo]({ producto: id }, "", url);
+}
+
+// ---------------------------------------------
+// Clicks en el cross-nav (un solo listener para todas las tarjetas,
+// funciona aunque las tarjetas se regeneren)
+// ---------------------------------------------
+document.querySelector(".cross-nav").addEventListener("click", (e) => {
+  const card = e.target.closest(".cross-nav-card");
+  if (!card) return;
+  const id = renderProduct(card.dataset.id);
+  actualizarURL(id);
+  window.scrollTo({ top: 0, behavior: "smooth" });
+});
+
+// Botón atrás/adelante del navegador
+window.addEventListener("popstate", () => {
+  renderProduct(obtenerIdDesdeURL() || PRODUCTO_POR_DEFECTO);
+});
+
+// ---------------------------------------------
+// Producto inicial (viene del QR o se usa el de por defecto)
+// ---------------------------------------------
+const idInicial = renderProduct(obtenerIdDesdeURL() || PRODUCTO_POR_DEFECTO);
+actualizarURL(idInicial, true); // replaceState: no ensucia el historial
